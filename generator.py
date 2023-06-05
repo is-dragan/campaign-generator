@@ -1,59 +1,70 @@
-import datetime
+import streamlit as st
+from datetime import date
 from datetime import timedelta
+import calendar
 
-def select_from_options(prompt, options):
-    while True:
-        print(f"{prompt} {str(options)}")
-        value = input()
-        if value in options:
-            return value
-        print("Неверный ввод, попробуйте еще раз.")
+def get_week_number(week_type):
+    today = date.today()
+    if week_type == 'Текущая':
+        return today.strftime("%YW%W")
+    elif week_type == 'Следующая':
+        next_week = today + timedelta(days=7)
+        return next_week.strftime("%YW%W")
+    else:
+        return ""
 
-def input_custom(prompt):
-    print(prompt)
-    return input()
+def campaign_generator():
+    st.title('Генератор названий кампаний')
 
-def week_number(dt):
-    return dt.strftime('%Y') + 'W' + dt.strftime('%W')
+    channel = st.selectbox('Выберите канал:', ['Email', 'Push'])
+    category = st.selectbox('Выберите категорию:', ['Билеты', 'Ещё', 'Контент', 'Маркетинг', 'Продукт', 'ПСЖР', 'Реклама', 'Ресёрч', 'Usercom'])
+    market = st.selectbox('Выберите рынок:', ['RU', 'AZ', 'BY', 'GE', 'KG', 'KZ', 'UZ'])
+    content = st.selectbox('Выберите содержание:', ['Билеты', 'Направления', 'Продукт: Короче', 'ПСЖР: Вопросы', 'ПСЖР: Дайджест', 'ПСЖР: Топ-дайджест', 'Советы', 'Фан'])
+    campaign_theme = st.text_input('Введите тему кампании:')
+    week = st.selectbox('Выберите неделю:', ['Текущая', 'Следующая', 'Без недели'])
+    segment = st.selectbox('Выберите сегмент:', ['Активные (3 месяца)', 'Вся база', 'Неактивные', 'Новые', 'Спящие (12+ месяцев)', 'Спящие (3-6 месяцев)', 'Спящие (6-12 месяцев)'])
+    subsegment = st.text_input('Введите подсегмент:')
+    num_versions = st.text_input('Введите число версий:')
+    iteration = st.text_input('Введите итерацию:')
+    
+    category_dict = {
+        'ПСЖР': 'ПСЖР',
+        'Маркетинг': 'Marketing',
+        'Контент': 'Content',
+        'Реклама': 'Adv',
+        'Билеты': 'Cheaptickets',
+        'Продукт': 'Product',
+        'Ресёрч': 'Research',
+        'Ещё': 'Ещё',
+        'Usercom': 'Usercom'
+    }
 
-def generate_campaign_name():
-    channels = ['Email', 'Push']
-    categories = ['Билеты', 'Ещё', 'Контент', 'Маркетинг', 'Продукт', 'ПСЖР', 'Реклама', 'Ресёрч', 'Usercom']
-    markets = ['RU', 'AZ', 'BY', 'GE', 'KG', 'KZ', 'UZ']
-    contents = ['Билеты', 'Направления', 'Продукт: Короче', 'ПСЖР: Вопросы', 'ПСЖР: Дайджест', 'ПСЖР: Топ-дайджест', 'Советы', 'Фан']
-    weeks = ['Текущая', 'Следующая', 'Без недели']
-    segments = ['Активные (3 месяца)', 'Вся база', 'Неактивные', 'Новые', 'Спящие (12+ месяцев)', 'Спящие (3-6 месяцев)', 'Спящие (6-12 месяцев)']
-    subsegments = ['Не открывали', 'С букингами', 'С серчами, без букингов']
+    content_dict = {
+        'Билеты': 'Билеты',
+        'Направления': 'Направления',
+        'Продукт: Короче': 'Продукт: Короче',
+        'ПСЖР: Вопросы': 'ПСЖР: Вопросы',
+        'ПСЖР: Дайджест': 'ПСЖР: Дайджест',
+        'ПСЖР: Топ-дайджест': 'ПСЖР: Топ-дайджест',
+        'Советы': 'Советы',
+        'Фан': 'Фан'
+    }
 
-    channel = select_from_options("Выберите канал:", channels)
-    category = select_from_options("Выберите категорию:", categories)
-    market = select_from_options("Выберите рынок:", markets)
-    content = select_from_options("Выберите содержание:", contents)
-    campaign_theme = input_custom("Введите тему кампании:")
-    week = select_from_options("Выберите неделю:", weeks)
-    segment = select_from_options("Выберите сегмент:", segments)
-    subsegment = input_custom("Введите подсегмент:")
-    versions_number = input_custom("Введите количество версий:")
-    iteration = input_custom("Введите номер итерации:")
-
-    if week == 'Текущая':
-        week = week_number(datetime.date.today())
-    elif week == 'Следующая':
-        week = week_number(datetime.date.today() + timedelta(days=7))
-
-    campaign_name = f"[{category}] {channel} - {market} - {content}"
-    if campaign_theme != "":
+    campaign_name = f"[{category_dict[category]}] {channel} - {market} - {content_dict[content]}"
+    if campaign_theme:
         campaign_name += f" - {campaign_theme}"
-    campaign_name += f" {week} - {segment}"
-    if subsegment != "":
+    campaign_name += f" {get_week_number(week)} - {segment}"
+    if subsegment:
         campaign_name += f" - {subsegment}"
-    if versions_number != "" and iteration != "":
-        campaign_name += f" - i{iteration}.v1-{versions_number}"
-    elif versions_number != "":
-        campaign_name += f" - v1-{versions_number}"
-    elif iteration != "":
+    if num_versions and iteration:
+        campaign_name += f" - i{iteration}.v1-{num_versions}"
+    elif num_versions:
+        campaign_name += f" - v1-{num_versions}"
+    elif iteration:
         campaign_name += f" - i{iteration}"
-    return campaign_name
+
+    if st.button('Сгенерировать имя кампании'):
+        st.success(campaign_name)
 
 if __name__ == "__main__":
-    print(generate_campaign_name())
+    campaign_generator()
