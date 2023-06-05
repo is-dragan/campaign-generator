@@ -1,4 +1,4 @@
-import datetime
+from datetime import timedelta
 
 def select_from_options(prompt, options):
     while True:
@@ -38,21 +38,8 @@ def generate_campaign_name():
     if week == 'Текущая':
         week = week_number(datetime.date.today())
     elif week == 'Следующая':
-        week = week_number(datetime.date.today() + datetime.timedelta(days=7))
+        week = week_number(datetime.date.today() + timedelta(days=7))
 
     campaign_name = f"[{category}] {channel} - {market} - {content}"
     if campaign_theme != "":
-        campaign_name += f" - {campaign_theme}"
-    campaign_name += f" {week} - {segment}"
-    if subsegment != "":
-        campaign_name += f" - {subsegment}"
-    if versions_number != "" and iteration != "":
-        campaign_name += f" - i{iteration}.v1-{versions_number}"
-    elif versions_number != "":
-        campaign_name += f" - v1-{versions_number}"
-    elif iteration != "":
-        campaign_name += f" - i{iteration}"
-    return campaign_name
-
-if __name__ == "__main__":
-    print(generate_campaign_name())
+        campaign_name += f"
